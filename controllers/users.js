@@ -2,8 +2,25 @@ let userModel = require("../schemas/users");
 let bcrypt = require('bcrypt')
 let jwt = require('jsonwebtoken')
 let fs = require('fs')
+let path = require('path')
+
+let privateKey = fs.readFileSync(path.join(__dirname, '..', 'private.key'), 'utf8')
 
 module.exports = {
+    ChangePassword: async function (userId, oldPassword, newPassword) {
+        let user = await userModel.findOne({ _id: userId, isDeleted: false });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        let isMatch = bcrypt.compareSync(oldPassword, user.password);
+        if (!isMatch) {
+            throw new Error("Old password is incorrect");
+        }
+        let salt = bcrypt.genSaltSync(10);
+        user.password = bcrypt.hashSync(newPassword, salt);
+        await userModel.updateOne({ _id: userId }, { password: user.password });
+        return true;
+    },
     CreateAnUser: async function (username, password, email, role, fullName, avatarUrl, status, loginCount) {
         let newItem = new userModel({
             username: username,
@@ -45,7 +62,8 @@ module.exports = {
             if (bcrypt.compareSync(password, user.password)) {
                 return jwt.sign({
                     id: user.id
-                }, 'secret', {
+                }, privateKey, {
+                    algorithm: 'RS256',
                     expiresIn: '1d'
                 })
             } else {
