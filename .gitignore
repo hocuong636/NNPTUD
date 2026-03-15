@@ -62,3 +62,4 @@ typings/
 
 # RSA private key
 private.key
+public.key
