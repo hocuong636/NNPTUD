@@ -23,7 +23,7 @@ router.post('/login', async function (req, res, next) {
 router.post('/register', RegisterValidator, validatedResult, async function (req, res, next) {
     let { username, password, email } = req.body;
     let newUser = await userController.CreateAnUser(
-        username, password, email, '69b6231b3de61addb401ea26'
+        username, password, email, '69b8f27483fa00b0a71e722b'
     )
     res.send(newUser)
 })

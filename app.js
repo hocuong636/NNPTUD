@@ -8,6 +8,9 @@ let mongoose = require('mongoose')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+// Pre-load inventory schema để post('save') hook trong Product có thể dùng mongoose.model('inventory')
+require('./schemas/inventory');
+
 var app = express();
 
 // view engine setup
@@ -26,6 +29,7 @@ app.use('/api/v1/products', require('./routes/products'));
 app.use('/api/v1/categories', require('./routes/categories'));
 app.use('/api/v1/roles', require('./routes/roles'));
 app.use('/api/v1/auth', require('./routes/auth'));
+app.use('/api/v1/inventory', require('./routes/inventory'));
 
 mongoose.connect('mongodb://localhost:27017/NNPTUD-C3');
 mongoose.connection.on('connected',()=>{

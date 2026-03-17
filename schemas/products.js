@@ -48,6 +48,26 @@ productSchema.pre('save', async function () {
         this.slug = this.slug + "-" + products.length
     }
 })
+
+// Tự động tạo Inventory khi tạo Product mới
+productSchema.post('save', async function (doc) {
+    try {
+        let inventoryModel = mongoose.model('inventory');
+        let existing = await inventoryModel.findOne({ product: doc._id });
+        if (!existing) {
+            await inventoryModel.create({
+                product: doc._id,
+                stock: 0,
+                reserved: 0,
+                soldCount: 0
+            });
+            console.log(`Inventory created for product: ${doc._id}`);
+        }
+    } catch (error) {
+        console.error(`Error creating inventory for product ${doc._id}:`, error.message);
+    }
+})
+
 module.exports = new mongoose.model(
     'product', productSchema
 )
