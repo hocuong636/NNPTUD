@@ -35,12 +35,12 @@ router.post('/register', RegisterValidator, validatedResult, async function (req
         })
         newCart = await newCart.save({ session })
         newCart = await newCart.populate('user')
-        session.commitTransaction()
-        session.endSession()
+        await session.commitTransaction()
+        await session.endSession()
         res.send(newCart)
     } catch (error) {
-        session.abortTransaction()
-        session.endSession()
+        await session.abortTransaction()
+        await session.endSession()
         res.status(404).send(error.message)
     }
 })
